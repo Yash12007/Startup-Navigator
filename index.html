@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Startup Idea Generator</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #000;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      color: #000;
+    }
+    
+    .card {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px;
+    }
+    
+    #generateButton {
+      margin-top: 20px;
+    }
+    
+    #idea {
+      color: black;
+    }
+    
+    #ideaCount {
+      color: black;
+    }
+    
+    #ideaDetails {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-5">Startup Idea Generator</h1>
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Select a category and click the button to generate a startup idea:</h5>
+        <div class="form-group">
+          <select id="categorySelect" class="form-control">
+            <option value="all">All Categories</option>
+            <option value="technology">Technology</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="environment">Environment</option>
+            <option value="education">Education</option>
+            <option value="food">Food</option>
+            <option value="fashion">Fashion</option>
+          </select>
+        </div>
+        <p id="idea" class="card-text"></p>
+        <div style="display: flex;">
+          <button id="generateButton" class="btn btn-primary mt-3">Generate</button>
+          <button id="shareButton" class="btn btn-success mt-3">Share idea</button>
+        </div>
+      </div>
+    </div>
+    <p id="ideaCount" class="card-text"></p>
+    <div id="ideaDetails" class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Idea Details</h5>
+        <p id="ideaDescription"></p>
+        <p id="ideaCategory"></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const ideas = [
+    { category: "technology", idea: "Social media platform for pet owners" },
+    { category: "technology", idea: "AI-powered personal assistant for productivity" },
+    { category: "environment", idea: "Eco-friendly packaging solution" },
+    { category: "technology", idea: "Online marketplace for locally sourced products" },
+    { category: "technology", idea: "Virtual reality fitness training" },
+    { category: "food", idea: "Food delivery service with a focus on healthy options" },
+    { category: "education", idea: "Educational app for learning programming" },
+    { category: "technology", idea: "Platform connecting freelance designers with clients" },
+    { category: "technology", idea: "Smart home automation system" },
+    { category: "fashion", idea: "Fashion rental subscription service" },
+    { category: "healthcare", idea: "Telemedicine platform for remote consultations" },
+    { category: "education", idea: "Online language learning community" },
+    { category: "food", idea: "Personalized meal planning and nutrition app" }
+  ];
+  
+  // Get all available categories
+  const categories = [...new Set(ideas.map(idea => idea.category))];
+  
+  // Update category options in the select element
+  const categorySelect = document.getElementById('categorySelect');
+  categories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+    categorySelect.appendChild(option);
+  });
+  
+  function generateIdea() {
+    const selectedCategory = categorySelect.value;
+    let filteredIdeas = ideas;
+  
+    if (selectedCategory !== 'all') {
+      filteredIdeas = ideas.filter(idea => idea.category === selectedCategory);
+    }
+  
+    if (filteredIdeas.length === 0) {
+      document.getElementById('idea').innerText = "No ideas available for the selected category.";
+      document.getElementById('ideaDetails').style.display = 'none';
+    } else {
+      const randomIndex = Math.floor(Math.random() * filteredIdeas.length);
+      const idea = filteredIdeas[randomIndex].idea;
+      document.getElementById('idea').innerText = idea;
+      document.getElementById('ideaDetails').style.display = 'block';
+  
+      // Update idea details
+      const ideaDescription = getIdeaDescription(idea);
+      const ideaCategory = getIdeaCategory(idea);
+      document.getElementById('ideaDescription').innerText = `Description: ${ideaDescription}`;
+      document.getElementById('ideaCategory').innerText = `Category: ${ideaCategory}`;
+    }
+  
+    // Display the number of ideas available for the selected category
+    const countMessage = filteredIdeas.length > 0 ? `(${filteredIdeas.length} ideas available)` : '';
+    document.getElementById('ideaCount').innerText = countMessage;
+  }
+  
+  function getIdeaDescription(idea) {
+    // Add your logic here to retrieve the idea description
+    // You can use a dictionary or API to fetch the description based on the idea
+  
+    // Example descriptions for the ideas in the 'ideas' array
+    const ideaDescriptions = {
+      "Social media platform for pet owners": "A social networking platform designed specifically for pet owners to connect, share photos and stories of their pets, and discover pet-related products and services.",
+      "AI-powered personal assistant for productivity": "An intelligent personal assistant that utilizes artificial intelligence and natural language processing to help users manage their tasks, schedule, and prioritize activities for improved productivity and efficiency.",
+      "Eco-friendly packaging solution": "An innovative packaging solution that utilizes sustainable and biodegradable materials to reduce the environmental impact of product packaging while ensuring the safety and protection of the contents.",
+      "Online marketplace for locally sourced products": "An e-commerce platform that connects local producers and artisans with consumers, providing a convenient way to discover and purchase high-quality locally sourced products, fostering community support and sustainable consumption.",
+      // Add more descriptions for other ideas...
+    };
+  
+    // Return the description if available, or a default message
+    return ideaDescriptions[idea] || "Description not available.";
+  }
+  
+  function getIdeaCategory(idea) {
+    // Add your logic here to retrieve the idea category
+    // You can use a dictionary or API to fetch the category based on the idea
+    return "Technology";
+  }
+  
+  function shareIdea() {
+    const idea = document.getElementById('idea').innerText;
+  
+    if (navigator.share) {
+      navigator.share({
+        title: 'Startup Idea',
+        text: idea
+      })
+        .catch((error) => {
+          console.error('Error sharing idea:', error);
+        });
+    } else {
+      // Fallback for platforms that do not support Web Share API
+      const shareUrl = encodeURIComponent(`Check out this startup idea: ${idea}`);
+      const whatsappUrl = `https://wa.me/?text=${shareUrl}`;
+      const mailUrl = `mailto:?subject=Startup Idea&body=${shareUrl}`;
+  
+      // You can add more platforms and customize the URLs based on your requirements
+  
+      // Open each platform's share URL in a new tab/window
+      window.open(whatsappUrl);
+      window.open(mailUrl);
+  
+      alert('Share the idea through available multimedia!');
+    }
+  }
+  
+  document.getElementById('generateButton').addEventListener('click', generateIdea);
+  document.getElementById('shareButton').addEventListener('click', shareIdea);
+  
+</script>
+</body>
+</html>
